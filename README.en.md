@@ -16,7 +16,7 @@ A fullscreen timer for poetry slams, open mics, pitch sessions, debates and any 
 |---|---|---|
 | ![Stages: 1 / 2 · Poet](screenshots/stages.jpg) | ![Overtime: +0:13](screenshots/overtime.jpg) | ![Settings dialog](screenshots/settings.jpg) |
 
-The interface is available in Belarusian and English. The screenshots show the Belarusian version; a plain look without the ornament and with a custom accent color is shown below.
+The interface is Belarusian by default and can be switched to English in settings or with `?lang=en`. The screenshots show the Belarusian version; a plain look without the ornament and with a custom accent color is shown below.
 
 ![Plain look: light theme, no ornament, blue accent](screenshots/plain.jpg)
 
@@ -33,7 +33,7 @@ The interface is available in Belarusian and English. The screenshots show the B
 - **Link with settings.** One button copies a URL that opens the timer with the same settings on any device. Handy for bookmarks per event format.
 - **Audience screen.** A second window without controls for the projector; control from the first one. The windows stay in sync on their own.
 - **Look.** Dark, light or system theme, a custom accent color, and the ornament can be switched off for a neutral look. Custom on-screen title.
-- **Interface language:** Belarusian and English, detected automatically, switchable in settings.
+- **Interface language:** Belarusian by default, English can be selected in settings.
 - **Offline and installable.** Fonts are bundled, a service worker caches everything; the timer can be installed as an app from the browser and opened without a network.
 - **Accurate timing** based on `performance.now()`, the screen stays on while counting (Wake Lock), shortcuts work in any keyboard layout, settings persist in the browser.
 - **No dependencies, no build step:** HTML, CSS and JS. Sounds are synthesized with Web Audio; the ornament is generated as SVG from a text cross-stitch chart.

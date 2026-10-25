@@ -33,7 +33,7 @@
   const PRESETS = [1, 2, 3, 5, 10, 15];        // хвіліны для хуткага выбару
   const DEFAULTS = {
     v: 2,
-    lang: '',                                  // '' — як у браўзера
+    lang: 'be',                                // мова інтэрфейсу па змаўчанні
     mode: 'countdown',                         // countdown | stopwatch
     segments: [{ name: '', duration: 180 }],   // этапы, секунды
     autoAdvance: false,
@@ -108,7 +108,7 @@
 
     return {
       v: 2,
-      lang: I18N[o.lang] ? o.lang : '',
+      lang: I18N[o.lang] ? o.lang : DEFAULTS.lang,
       mode: o.mode === 'stopwatch' ? 'stopwatch' : 'countdown',
       segments: segments.length ? segments : DEFAULTS.segments.map((g) => ({ ...g })),
       autoAdvance: toBool(o.autoAdvance, false),
@@ -168,7 +168,7 @@
   function toParams(s) {
     const p = new URLSearchParams();
     const d = DEFAULTS;
-    if (s.lang) p.set('lang', s.lang);
+    if (s.lang !== d.lang) p.set('lang', s.lang);
     if (s.mode !== d.mode) p.set('mode', s.mode);
     if (s.segments.length > 1 || s.segments[0].name) {
       p.set('seq', s.segments.map((g) => (g.name ? g.name.replace(/[,=]/g, ' ').trim() + '=' : '') + fmt(g.duration)).join(','));
@@ -199,15 +199,7 @@
      Мова
      ============================================================ */
   let L = I18N.be || {};
-  function detectLang() {
-    for (const tag of navigator.languages || [navigator.language || 'en']) {
-      const code = String(tag).slice(0, 2).toLowerCase();
-      if (code === 'be' || code === 'ru') return 'be';
-      if (I18N[code]) return code;
-    }
-    return 'en';
-  }
-  const langOf = (s = settings) => s.lang || detectLang();
+  const langOf = (s = settings) => s.lang || DEFAULTS.lang;
   const t = (key) => (L[key] != null ? L[key] : (I18N.be && I18N.be[key]) || key);
   function applyLang(s = settings) {
     const code = langOf(s);

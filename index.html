@@ -2,12 +2,22 @@
 <html lang="be" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Паэтычны слэм — таймер</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2315100e'/%3E%3Cpath d='M16 4 28 16 16 28 4 16Z' fill='%23c4262e'/%3E%3Cpath d='M16 11 21 16 16 21 11 16Z' fill='%23f2e6c9'/%3E%3C/svg%3E">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Таймер · Паэтычны слэм</title>
+  <meta name="description" content="Паўнаэкранны таймер для паэтычных слэмаў, адкрытых мікрафонаў і выступаў з рэгламентам. Fullscreen stage timer for poetry slams, open mics and talks.">
+  <meta name="theme-color" content="#15100e">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://timer.itbeard.com/">
+  <meta property="og:title" content="Slam Timer · Таймер для слэму">
+  <meta property="og:description" content="Fullscreen stage timer for poetry slams, open mics and talks. Паўнаэкранны таймер для выступаў з рэгламентам.">
+  <meta property="og:image" content="https://timer.itbeard.com/screenshots/dark.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="ui" data-status="idle">
@@ -20,74 +30,200 @@
       <h1 id="title">Паэтычны слэм</h1>
       <span class="gem" aria-hidden="true"></span>
     </header>
+    <p class="subtitle" id="subtitle" hidden></p>
 
-    <section class="clock" id="clock">
+    <section class="clock" id="clock" aria-hidden="true">
       <div class="digits" id="digits"></div>
-      <div class="timeout" id="timeout">Time out</div>
+      <div class="endtext" id="endtext">Час выйшаў</div>
     </section>
 
-    <div class="thread" aria-hidden="true"><span id="thread-fill"></span></div>
+    <div class="thread" id="thread" aria-hidden="true"><span id="thread-fill"></span></div>
   </main>
 
   <div class="orn orn-bottom" aria-hidden="true"></div>
 
-  <nav class="controls" id="controls" aria-label="Кіраванне таймерам">
+  <div class="flash" aria-hidden="true"></div>
+
+  <div class="badge" id="badge-muted" hidden aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 5 6M21 9l-5 6"/></svg>
+  </div>
+
+  <div class="toast" id="toast" aria-hidden="true"></div>
+  <p class="sr-only" id="live" role="status" aria-live="polite"></p>
+
+  <nav class="controls" id="controls" aria-label="Кіраванне таймерам" data-i18n-aria="controls">
     <button type="button" id="btn-toggle" class="btn primary">Старт</button>
-    <button type="button" id="btn-restart" class="btn">Перазапуск</button>
-    <button type="button" id="btn-reset" class="btn">Скід</button>
-    <button type="button" id="btn-settings" class="btn">Налады</button>
-    <button type="button" id="btn-full" class="btn">На ўвесь экран</button>
-    <p class="hint">Space — старт / паўза &nbsp;·&nbsp; Enter — перазапуск &nbsp;·&nbsp; R — скід &nbsp;·&nbsp; F — на ўвесь экран &nbsp;·&nbsp; S — налады</p>
+    <button type="button" id="btn-next" class="btn" data-i18n="next" hidden>Наступны</button>
+    <button type="button" id="btn-restart" class="btn" data-i18n="restart">Перазапуск</button>
+    <button type="button" id="btn-reset" class="btn" data-i18n="reset">Скід</button>
+    <button type="button" id="btn-settings" class="btn" data-i18n="settings">Налады</button>
+    <button type="button" id="btn-full" class="btn" data-i18n="fullscreen">На ўвесь экран</button>
+    <p class="hint" id="hint">Space — старт / паўза · Enter — перазапуск · R — скід · F — экран · S — налады</p>
   </nav>
 
-  <dialog id="settings">
-    <div class="orn orn-mini" aria-hidden="true"></div>
-    <form method="dialog" id="settings-form">
-      <h2>Налады</h2>
+  <dialog id="settings" aria-labelledby="settings-title">
+    <form method="dialog" id="settings-form" novalidate>
+      <div class="orn orn-mini" aria-hidden="true"></div>
 
-      <div class="row">
-        <label>Хвіліны
-          <input type="number" id="set-min" min="0" max="99" step="1" inputmode="numeric">
-        </label>
-        <label>Секунды
-          <input type="number" id="set-sec" min="0" max="59" step="1" inputmode="numeric">
-        </label>
+      <header class="dlg-head">
+        <h2 id="settings-title" data-i18n="settings">Налады</h2>
+        <button type="button" class="icon-btn" id="btn-close" aria-label="Закрыць" data-i18n-aria="close">×</button>
+      </header>
+
+      <div class="tabs" role="tablist">
+        <button type="button" class="tab on" role="tab" aria-selected="true" data-tab="time" data-i18n="tab_time">Час</button>
+        <button type="button" class="tab" role="tab" aria-selected="false" data-tab="signals" data-i18n="tab_signals">Сігналы</button>
+        <button type="button" class="tab" role="tab" aria-selected="false" data-tab="look" data-i18n="tab_look">Выгляд</button>
+        <button type="button" class="tab" role="tab" aria-selected="false" data-tab="more" data-i18n="tab_more">Яшчэ</button>
       </div>
 
-      <label>Сігнал за столькі секунд да канца
-        <input type="number" id="set-warn" min="0" max="5999" step="1" inputmode="numeric">
-      </label>
+      <div class="dlg-body">
 
-      <label class="check">
-        <input type="checkbox" id="set-sound">
-        <span>Тры «пікі» перад канцом</span>
-      </label>
+        <!-- Час -->
+        <section class="panel" data-panel="time" role="tabpanel">
+          <div class="field">
+            <span class="lbl" data-i18n="mode">Рэжым</span>
+            <div class="seg">
+              <label><input type="radio" name="mode" value="countdown"><span data-i18n="mode_countdown">Адлік</span></label>
+              <label><input type="radio" name="mode" value="stopwatch"><span data-i18n="mode_stopwatch">Секундамер</span></label>
+            </div>
+          </div>
 
-      <label class="check">
-        <input type="checkbox" id="set-endsound">
-        <span>Пяць «пікаў», калі час скончыўся</span>
-      </label>
+          <div id="countdown-opts" class="panel">
+            <div class="field">
+              <span class="lbl" data-i18n="duration">Працягласць</span>
+              <div class="timebox" id="timebox">
+                <div class="seglist" id="segments"></div>
+                <div class="chips" id="chips"></div>
+              </div>
+              <p class="help" id="seg-help" data-i18n="stages_help" hidden>Этапы ідуць адзін за адным: напрыклад, выступ 3:00, потым журы 1:00.</p>
+              <button type="button" class="link" id="btn-add-seg">+ <span data-i18n="add_stage">Дадаць этап</span></button>
+            </div>
 
-      <label>Загаловак на экране
-        <input type="text" id="set-title" maxlength="60" autocomplete="off">
-      </label>
+            <label class="switch" id="row-auto" hidden>
+              <span data-i18n="auto_advance">Аўтаматычна пачынаць наступны этап</span>
+              <input type="checkbox" id="set-auto">
+            </label>
 
-      <label>Тэма
-        <select id="set-theme">
-          <option value="dark">Цёмная (ноч)</option>
-          <option value="light">Светлая (палатно)</option>
-        </select>
-      </label>
+            <div class="field">
+              <span class="lbl" data-i18n="after_zero">Пасля нуля</span>
+              <div class="seg">
+                <label><input type="radio" name="after" value="label"><span data-i18n="after_label">Надпіс</span></label>
+                <label><input type="radio" name="after" value="overtime"><span data-i18n="after_over">Лічыць перабор</span></label>
+              </div>
+            </div>
 
-      <div class="actions">
-        <button type="button" id="btn-test-sound" class="btn">Праверыць гук</button>
+            <label class="field">
+              <span class="lbl" data-i18n="end_text">Надпіс у канцы</span>
+              <input type="text" id="set-end" maxlength="40" autocomplete="off">
+            </label>
+          </div>
+        </section>
+
+        <!-- Сігналы -->
+        <section class="panel" data-panel="signals" role="tabpanel" hidden>
+          <label class="field">
+            <span class="lbl" id="lbl-warn">Папярэджанні, секунд да канца</span>
+            <input type="text" id="set-warn" inputmode="numeric" autocomplete="off" placeholder="60, 15">
+            <span class="help" id="help-warn"></span>
+          </label>
+
+          <div class="switches">
+            <label class="switch"><span data-i18n="warn_sound">Гук пры папярэджанні</span><input type="checkbox" id="set-sound"></label>
+            <label class="switch"><span data-i18n="end_sound">Гук у канцы</span><input type="checkbox" id="set-endsound"></label>
+            <label class="switch"><span data-i18n="tick">Цікаць апошнія 10 секунд</span><input type="checkbox" id="set-tick"></label>
+            <label class="switch"><span data-i18n="flash">Успышка экрана ў канцы</span><input type="checkbox" id="set-flash"></label>
+          </div>
+
+          <div class="field">
+            <span class="lbl" data-i18n="volume">Гучнасць</span>
+            <div class="inline">
+              <input type="range" id="set-volume" min="0" max="100" step="5">
+              <button type="button" class="btn" id="btn-test-sound" data-i18n="test">Праверыць</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Выгляд -->
+        <section class="panel" data-panel="look" role="tabpanel" hidden>
+          <label class="field">
+            <span class="lbl" data-i18n="title_lbl">Загаловак на экране</span>
+            <input type="text" id="set-title" maxlength="60" autocomplete="off">
+          </label>
+
+          <div class="field">
+            <span class="lbl" data-i18n="theme">Тэма</span>
+            <div class="seg">
+              <label><input type="radio" name="theme" value="dark"><span data-i18n="theme_dark">Цёмная</span></label>
+              <label><input type="radio" name="theme" value="light"><span data-i18n="theme_light">Светлая</span></label>
+              <label><input type="radio" name="theme" value="system"><span data-i18n="theme_system">Сістэмная</span></label>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="lbl" data-i18n="accent">Акцэнтны колер</span>
+            <div class="inline">
+              <input type="color" id="set-accent" value="#c4262e">
+              <button type="button" class="link" id="btn-accent-reset" data-i18n="reset_accent">Вярнуць</button>
+            </div>
+          </div>
+
+          <label class="switch"><span data-i18n="ornament">Арнамент</span><input type="checkbox" id="set-orn"></label>
+
+          <label class="field">
+            <span class="lbl" data-i18n="language">Мова</span>
+            <select id="set-lang">
+              <option value="be">Беларуская</option>
+              <option value="en">English</option>
+            </select>
+          </label>
+        </section>
+
+        <!-- Яшчэ -->
+        <section class="panel" data-panel="more" role="tabpanel" hidden>
+          <div class="field">
+            <button type="button" class="btn wide" id="btn-copy-link" data-i18n="copy_link">Скапіяваць спасылку з наладамі</button>
+            <p class="help" data-i18n="copy_link_help">Адкрые таймер з гэтымі наладамі на любой прыладзе.</p>
+            <input type="text" id="link-out" readonly hidden>
+          </div>
+
+          <div class="field">
+            <button type="button" class="btn wide" id="btn-display" data-i18n="open_display">Адкрыць экран для залы</button>
+            <p class="help" data-i18n="open_display_help">Другое акно без кнопак. Перацягніце яго на праектар і націсніце F. Кіруйце адсюль.</p>
+          </div>
+
+          <details class="keys">
+            <summary data-i18n="keys">Клавішы</summary>
+            <dl>
+              <dt><kbd>Space</kbd></dt><dd data-i18n="k_space">Старт / паўза</dd>
+              <dt><kbd>Enter</kbd></dt><dd data-i18n="k_enter">Перазапуск</dd>
+              <dt><kbd>R</kbd></dt><dd data-i18n="k_r">Скід</dd>
+              <dt><kbd>Shift</kbd> <kbd>R</kbd></dt><dd data-i18n="k_shift_r">Да першага этапу</dd>
+              <dt><kbd>F</kbd></dt><dd data-i18n="k_f">На ўвесь экран</dd>
+              <dt><kbd>S</kbd></dt><dd data-i18n="k_s">Налады</dd>
+              <dt><kbd>M</kbd></dt><dd data-i18n="k_m">Выключыць / уключыць гук</dd>
+              <dt><kbd>1</kbd>…<kbd>9</kbd> <kbd>0</kbd></dt><dd data-i18n="k_digits">Хуткі выбар хвілін (0 — дзесяць)</dd>
+              <dt><kbd>↑</kbd> <kbd>↓</kbd></dt><dd data-i18n="k_updown">± 1 хвіліна</dd>
+              <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd data-i18n="k_leftright">± 10 секунд</dd>
+              <dt><kbd>N</kbd> <kbd>PgDn</kbd></dt><dd data-i18n="k_next">Наступны этап</dd>
+              <dt><kbd>P</kbd> <kbd>PgUp</kbd></dt><dd data-i18n="k_prev">Папярэдні этап</dd>
+              <dt><kbd>Esc</kbd></dt><dd data-i18n="k_esc">Закрыць налады</dd>
+            </dl>
+          </details>
+        </section>
+
+      </div>
+
+      <footer class="dlg-foot">
+        <button type="button" class="link" id="btn-defaults" data-i18n="defaults">Скінуць налады</button>
         <span class="spacer"></span>
-        <button type="button" id="btn-cancel" class="btn">Адмена</button>
-        <button type="submit" class="btn primary">Захаваць</button>
-      </div>
+        <button type="button" class="btn" id="btn-cancel" data-i18n="cancel">Адмена</button>
+        <button type="submit" class="btn primary" data-i18n="save">Захаваць</button>
+      </footer>
     </form>
   </dialog>
 
+  <script src="strings.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

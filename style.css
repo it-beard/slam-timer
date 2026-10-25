@@ -1,0 +1,326 @@
+/* ============================================================
+   Таймер для паэтычнага слэму — стыль «вышыванка»
+   Колеры мяняюцца тут, у зменных :root
+   ============================================================ */
+
+:root {
+  --band: clamp(44px, 8.5vh, 120px);   /* вышыня арнаментнай палосы */
+  --fs: min(40vw, 54vh);                /* памер лічбаў */
+
+  --bg: #15100e;
+  --bg-2: #261b18;
+  --fg: #f2e6c9;
+  --muted: rgba(242, 230, 201, 0.55);
+  --line: rgba(242, 230, 201, 0.22);
+  --red: #c4262e;
+  --red-soft: rgba(196, 38, 46, 0.35);
+  --orn-a: #c4262e;                     /* асноўны колер арнаменту */
+  --orn-b: #f2e6c9;                     /* дадатковы колер арнаменту */
+  --weave: rgba(255, 255, 255, 0.035);  /* фактура палатна */
+  --shadow: rgba(0, 0, 0, 0.45);
+  --btn-bg: rgba(0, 0, 0, 0.35);
+  --input-bg: rgba(0, 0, 0, 0.28);
+
+  --font: "Playfair Display", "Times New Roman", Times, serif;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #f1e7d3;
+  --bg-2: #f8f0e0;
+  --fg: #17110f;
+  --muted: rgba(23, 17, 15, 0.6);
+  --line: rgba(23, 17, 15, 0.25);
+  --red: #b1222b;
+  --red-soft: rgba(177, 34, 43, 0.22);
+  --orn-a: #b1222b;
+  --orn-b: #17110f;
+  --weave: rgba(0, 0, 0, 0.05);
+  --shadow: rgba(0, 0, 0, 0.12);
+  --btn-bg: rgba(255, 255, 255, 0.5);
+  --input-bg: rgba(255, 255, 255, 0.6);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; margin: 0; }
+
+body {
+  font-family: var(--font);
+  color: var(--fg);
+  background-color: var(--bg);
+  background-image: radial-gradient(ellipse at center, var(--bg-2) 0%, var(--bg) 72%);
+  display: grid;
+  grid-template-rows: var(--band) 1fr var(--band);
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* фактура палатна */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, var(--weave) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, var(--weave) 0 1px, transparent 1px 3px);
+}
+
+body:not(.ui) { cursor: none; }
+
+/* ---------- арнамент ---------- */
+.orn {
+  position: relative;
+  z-index: 1;
+  height: var(--band);
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+  background-position: center top;
+}
+
+/* ---------- сцэна ---------- */
+.stage {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2vh;
+  padding: 0 3vw 3vh;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 1.1em;
+  margin: 0;
+  font-size: clamp(14px, 2.4vh, 32px);
+  letter-spacing: .38em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+.title h1 {
+  font: inherit;
+  font-weight: 400;
+  margin: 0;
+  padding-left: .38em; /* кампенсацыя letter-spacing, каб тэкст быў па цэнтры */
+  text-align: center;
+}
+.gem {
+  flex: none;
+  width: .55em;
+  height: .55em;
+  background: var(--red);
+  transform: rotate(45deg);
+}
+
+/* ---------- гадзіннік ---------- */
+.clock {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.digits {
+  font-size: var(--fs);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  font-variant-numeric: lining-nums tabular-nums;
+  text-shadow: 0 .02em .06em var(--shadow);
+  transition: color .4s ease;
+}
+.clock.wide .digits { font-size: min(30vw, 54vh); }
+
+.digits .d { display: inline-block; width: .64em; text-align: center; }
+.digits .c { display: inline-block; width: .3em; text-align: center; transform: translateY(-.04em); }
+
+.clock.warn .digits {
+  color: var(--red);
+  text-shadow: 0 0 .12em var(--red-soft), 0 .02em .06em var(--shadow);
+  animation: pulse 1s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.025); }
+}
+
+.timeout {
+  display: none;
+  font-size: min(19vw, 42vh);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  text-shadow: 0 .02em .06em var(--shadow);
+}
+.clock.done .digits { display: none; }
+.clock.done .timeout { display: block; animation: rise .7s ease-out both; }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(.08em); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- «нітка» — колькі засталося ---------- */
+.thread {
+  position: relative;
+  width: min(70vw, 900px);
+  height: 3px;
+  background: var(--line);
+}
+.thread span {
+  position: absolute;
+  inset: 0;
+  background: var(--red);
+  transform-origin: center;
+  transform: scaleX(1);
+}
+.thread::before,
+.thread::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  background: var(--red);
+  transform: translateY(-50%) rotate(45deg);
+}
+.thread::before { left: -16px; }
+.thread::after  { right: -16px; }
+
+/* ---------- кіраванне ---------- */
+.controls {
+  position: fixed;
+  z-index: 5;
+  left: 50%;
+  bottom: calc(var(--band) + 2.2vh);
+  transform: translateX(-50%);
+  width: min(96vw, 1100px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .6rem;
+  opacity: 1;
+  transition: opacity .35s ease;
+}
+body:not(.ui) .controls { opacity: 0; pointer-events: none; }
+
+.btn {
+  font: inherit;
+  font-size: clamp(13px, 1.7vh, 19px);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: .65em 1.3em;
+  color: var(--fg);
+  background: var(--btn-bg);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color .2s, background .2s, filter .2s;
+}
+.btn:hover { border-color: var(--red); background: var(--red-soft); }
+.btn:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.btn.primary { background: var(--red); border-color: var(--red); color: #fff8ec; }
+.btn.primary:hover { filter: brightness(1.12); }
+
+.hint {
+  flex-basis: 100%;
+  margin: .1em 0 0;
+  text-align: center;
+  font-size: clamp(11px, 1.35vh, 15px);
+  letter-spacing: .08em;
+  color: var(--muted);
+}
+
+/* ---------- налады ---------- */
+dialog {
+  width: min(92vw, 470px);
+  padding: 0;
+  border: 1px solid var(--red);
+  border-radius: 4px;
+  background: var(--bg-2);
+  color: var(--fg);
+  font-family: var(--font);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .5);
+}
+dialog::backdrop {
+  background: rgba(0, 0, 0, .6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+dialog .orn-mini { height: 30px; z-index: auto; }
+
+dialog form {
+  display: grid;
+  gap: 1rem;
+  padding: 1.3rem 1.6rem 1.6rem;
+}
+dialog h2 {
+  margin: 0 0 .2rem;
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+label {
+  display: grid;
+  gap: .35rem;
+  font-size: .9rem;
+  letter-spacing: .04em;
+  color: var(--muted);
+}
+label.check {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: .7rem;
+  color: var(--fg);
+  cursor: pointer;
+}
+
+input[type="number"],
+input[type="text"],
+select {
+  width: 100%;
+  font: inherit;
+  font-size: 1.1rem;
+  color: var(--fg);
+  background: var(--input-bg);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: .5em .7em;
+}
+input:focus, select:focus { outline: none; border-color: var(--red); }
+input[type="checkbox"] { width: 1.15em; height: 1.15em; margin: 0; accent-color: var(--red); }
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-top: .4rem;
+}
+.spacer { flex: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .clock.warn .digits { animation: none; }
+  .clock.done .timeout { animation: none; }
+}

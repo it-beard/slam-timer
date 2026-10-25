@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="be" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Паэтычны слэм — таймер</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2315100e'/%3E%3Cpath d='M16 4 28 16 16 28 4 16Z' fill='%23c4262e'/%3E%3Cpath d='M16 11 21 16 16 21 11 16Z' fill='%23f2e6c9'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="ui" data-status="idle">
+
+  <div class="orn orn-top" aria-hidden="true"></div>
+
+  <main class="stage">
+    <header class="title">
+      <span class="gem" aria-hidden="true"></span>
+      <h1 id="title">Паэтычны слэм</h1>
+      <span class="gem" aria-hidden="true"></span>
+    </header>
+
+    <section class="clock" id="clock">
+      <div class="digits" id="digits"></div>
+      <div class="timeout" id="timeout">Time out</div>
+    </section>
+
+    <div class="thread" aria-hidden="true"><span id="thread-fill"></span></div>
+  </main>
+
+  <div class="orn orn-bottom" aria-hidden="true"></div>
+
+  <nav class="controls" id="controls" aria-label="Кіраванне таймерам">
+    <button type="button" id="btn-toggle" class="btn primary">Старт</button>
+    <button type="button" id="btn-restart" class="btn">Перазапуск</button>
+    <button type="button" id="btn-reset" class="btn">Скід</button>
+    <button type="button" id="btn-settings" class="btn">Налады</button>
+    <button type="button" id="btn-full" class="btn">На ўвесь экран</button>
+    <p class="hint">Space — старт / паўза &nbsp;·&nbsp; Enter — перазапуск &nbsp;·&nbsp; R — скід &nbsp;·&nbsp; F — на ўвесь экран &nbsp;·&nbsp; S — налады</p>
+  </nav>
+
+  <dialog id="settings">
+    <div class="orn orn-mini" aria-hidden="true"></div>
+    <form method="dialog" id="settings-form">
+      <h2>Налады</h2>
+
+      <div class="row">
+        <label>Хвіліны
+          <input type="number" id="set-min" min="0" max="99" step="1" inputmode="numeric">
+        </label>
+        <label>Секунды
+          <input type="number" id="set-sec" min="0" max="59" step="1" inputmode="numeric">
+        </label>
+      </div>
+
+      <label>Сігнал за столькі секунд да канца
+        <input type="number" id="set-warn" min="0" max="5999" step="1" inputmode="numeric">
+      </label>
+
+      <label class="check">
+        <input type="checkbox" id="set-sound">
+        <span>Тры «пікі» перад канцом</span>
+      </label>
+
+      <label class="check">
+        <input type="checkbox" id="set-endsound">
+        <span>Пяць «пікаў», калі час скончыўся</span>
+      </label>
+
+      <label>Загаловак на экране
+        <input type="text" id="set-title" maxlength="60" autocomplete="off">
+      </label>
+
+      <label>Тэма
+        <select id="set-theme">
+          <option value="dark">Цёмная (ноч)</option>
+          <option value="light">Светлая (палатно)</option>
+        </select>
+      </label>
+
+      <div class="actions">
+        <button type="button" id="btn-test-sound" class="btn">Праверыць гук</button>
+        <span class="spacer"></span>
+        <button type="button" id="btn-cancel" class="btn">Адмена</button>
+        <button type="submit" class="btn primary">Захаваць</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>

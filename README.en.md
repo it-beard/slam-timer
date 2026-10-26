@@ -108,7 +108,7 @@ Tips:
 Download the repository and open `index.html` in a browser. No server and no build step are needed.
 
 ```bash
-git clone https://github.com/it-beard/slam-timer.git
+git clone https://github.com/it-beard/timer.git
 open slam-timer/index.html
 ```
 

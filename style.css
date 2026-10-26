@@ -637,6 +637,10 @@ dialog .btn.wide { width: 100%; }
   align-items: center;
 }
 .keys dt, .keys dd { margin: 0; }
+
+.about a { color: var(--red); text-decoration: none; }
+.about a:hover { text-decoration: underline; }
+.about a:focus-visible { outline: 2px solid var(--red); border-radius: 4px; }
 kbd {
   display: inline-block;
   min-width: 1.7em;

@@ -104,7 +104,7 @@ https://timer.itbeard.com/?seq=Паэт=3:00,Журы=1:00&warn=60,15&over=1
 Спампуйце рэпазіторый і адкрыйце `index.html` у браўзеры. Сервер і зборка не патрэбныя.
 
 ```bash
-git clone https://github.com/it-beard/slam-timer.git
+git clone https://github.com/it-beard/timer.git
 open slam-timer/index.html
 ```
 
